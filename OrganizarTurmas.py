@@ -35,6 +35,10 @@ class Schedule:
             classes=self.get_classes()
             for i in range(0,len(classes)):
                 if (classes[i].get_sala().get_capacidade<Mateira[i].get_MaxnumberOfstudents()):self._numeroDeConflitos+=1
+                for j in range(0,len(class)):
+                    if(j>=i):
+                        if (classes[i]).get_horadaaula()== classes[j].get-haradaaula() and classes[i]get_id() !=classes[j]
+                        if (classes)
 class Populacao:
     .... ....
 
