@@ -1,4 +1,4 @@
-import prettytable as prettytable
+from prettytable import PrettyTable as PrettyTable
 import random as rnd
 POPULATIO_SIZE=9
 NUMBER_OF_ELITE_SCHEDULES=1
@@ -15,29 +15,29 @@ class Informacoes:
                  ["P3", "Francisco"],
                  ["P4", "Nayara"]]
     
-def __init__(self):
-    self._salas=[];self._horadasaulas=[]; self._professores[]
-    for i in range (0,len(self.Salas)):
-        self._salas.append(Sala(self.Salas[i][0],self.Salas[i][1]))
-    for i in range (0,len(self.HoradasAulas)):
-        self._horadasaulas.append(HoradaAula(self.HoradasAulas[i][0],self.HoradasAulas[i][1]))
-    for i in range (0,len(self.Salas)):
-        self._professores.append(Professor(self.Professores[i][0],self.Professores[i][1]))
-    materia1= Materia(1,"Matématica Discreata",[self._professores[0]],36)
-    materia2= Materia(2,"Inteligência Artificial",[self._professores[1]],45)
-    materia3= Materia(3,"Banco de Dados",[self._professores[0]],34)
-    materia4= Materia(4,"Segurança da Informaçção",[self._professores[2]],36)
-    materia5= Materia(5,"Calculo",[self._professores[3]],45)
-    materia6= Materia(6,"Estágio Curricular",[self._professores[4]],44)
-    materia7= Materia(7,"Teste de Coclusãode Curso",[self._professores[3]],45)
-    self._materias=[materia1,materia2,materia3,materia4,materia5,materia6,materia7]
-    hora1=Horario("5 periodo",[materia1, materia2,materia4,materia5])
-    hora2=Horario("6 periodo",[materia3,materia6,materia5])
-    hora3=Horario("7 periodo",[materia7,materia4])
-    self._horarios=[hora1,hora2,hora3]
-    self._numerodeclasses=0
-    for i in range(0,len(self._horarios)):
-        self._numerodeclasses += len(self._horarios[i].get_materia())
+    def __init__(self):
+        self._salas=[];self._horadasaulas=[]; self._professores[]
+        for i in range (0,len(self.Salas)):
+            self._salas.append(Sala(self.Salas[i][0],self.Salas[i][1]))
+        for i in range (0,len(self.HoradasAulas)):
+            self._horadasaulas.append(HoradaAula(self.HoradasAulas[i][0],self.HoradasAulas[i][1]))
+        for i in range (0,len(self.Salas)):
+            self._professores.append(Professor(self.Professores[i][0],self.Professores[i][1]))
+        materia1= Materia(1,"Matématica Discreata",[self._professores[0]],36)
+        materia2= Materia(2,"Inteligência Artificial",[self._professores[1]],45)
+        materia3= Materia(3,"Banco de Dados",[self._professores[0]],34)
+        materia4= Materia(4,"Segurança da Informaçção",[self._professores[2]],36)
+        materia5= Materia(5,"Calculo",[self._professores[3]],45)
+        materia6= Materia(6,"Estágio Curricular",[self._professores[4]],44)
+        materia7= Materia(7,"Teste de Coclusãode Curso",[self._professores[3]],45)
+        self._materias=[materia1,materia2,materia3,materia4,materia5,materia6,materia7]
+        hora1=Horario("5 periodo",[materia1, materia2,materia4,materia5])
+        hora2=Horario("6 periodo",[materia3,materia6,materia5])
+        hora3=Horario("7 periodo",[materia7,materia4])
+        self._horarios=[hora1,hora2,hora3]
+        self._numerodeclasses=0
+        for i in range(0,len(self._horarios)):
+            self._numerodeclasses += len(self._horarios[i].get_materia())
     def get_salas(self): return self._salas
     def get_professores(self): return self._professores
     def get_materias(self): return self._materias
@@ -94,11 +94,48 @@ class Schedule:
         return returnValue
         
 class Populacao:
-    .... ....
-
+    def __init__(self,size):
+        self._size=size
+        self._Informacao=Informacoes
+        self._schedules=[]
+        for i in range(0,size): self._schedules.append(Schedule().initialize())
+    def get_schedules(self): return self._schedules
 class AlgoritimoGenetico:
-    ... ...
-
+    def evolve (self,population): return self._mutate_population(self._crossover_population(population))
+    def croosover_population(self,pop):
+        crossover_pop= Populacao(0)
+        for i in range(NUMBER_OF_ELITE_SCHEDULES):
+            crossover_pop.get_schedules().append(pop.get_schedules()[i])
+        i=NUMBER_OF_ELITE_SCHEDULES
+        while i < POPULATIO_SIZE:
+            schedule1=self._select_tournament_population(pop).get_schedules()[0]
+            schedule2=self._select_tournament_population(pop).get_schedules()[0]
+            crossover_pop.get_schedules().append(self._crossover_schedule(schedule1,schedule2))
+            i+=1
+        return crossover_pop
+    def _mutate_population(self,population):
+        for i in range (NUMBER_OF_ELITE_SCHEDULES):
+            self._mutate_schedule(population.get_schedules()[i])
+        return population
+    def _crossover_schedule(self,schedule1,schedule2):
+        crossoverSchedule=Schedule().initialize()
+        for i in range(0,len(crossoverSchedule.get_horarios())):
+            if(rnd.random()>0.5): crossoverSchedule.get_horarios()[i]= schedule1.get_horarios()[i]
+            else: crossoverSchedule.get_horarios()[i]= schedule2.get_horarios()[i]
+        return crossoverSchedule
+    def _mutate_schedule(self,mutateSchedule):
+        schedule = Schedule().initialize()
+        for i in range(0,len(mutateSchedule.get_horarios())):
+            if (MUTATION_RATE > rnd.random()): mutateSchedule.get_horario()[i]= schedule.get_horarios()[i]
+        return mutateSchedule
+    def _select_tournament_population(self,pop):
+        tournament_pop=Populacao(0)
+        i=0
+        while i < TOURNAMENT_SELECTION_SIZE:
+            tournament_pop.get_schedules().append(pop.get_schedules()[rnd.randrange(0,POPULATIO_SIZE)])
+            i+=1
+        tournament_pop.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
+        return tournament_pop
 class Materia:
     def __init__(self,number,name,instructor,MaxnumberOfstudents):
         self.number=number
@@ -158,5 +195,43 @@ class Horario:
     def set_sala(self,sala):self._sala=sala
     def __str__(self):
         return str(self._periodo.get_name())+ "," + str(self._materia.get_number()) + "," + str(self._sala.get_numero())+ "," + str(self._professor.get_id()) + "," + str(self._horadaaula.getide())
-    
-informacao=Informacoes()
+
+class DisplayMgr:
+    def print_avaliable_data(self):
+        print("> All Avaliable Data")
+        self.print_periodo
+        self.print_materia
+        self.print_sala
+        self.print_professor
+        self.print_horadaaula
+    def print_periodo(self):
+        periodo=Informacoes.get_horarios()
+        TabeladeperiodosDisponiveis= PrettyTable(["Período","Matérias"])
+        for i in range(0,len(periodo)):
+            materia=periodo._getitem_(i).get_materias()
+            tempStr="["
+            for j in range(0,len(materia)-1):
+                tempStr+=materia[j].__str__()+","
+            tempStr+=materia[len(materia)-1].__str__()+"]"
+            TabeladeperiodosDisponiveis.add_row([periodo._getitem_(i).get_name(), tempStr])
+        print(TabeladeperiodosDisponiveis)
+    def print_materia
+Informacao=Informacoes()
+
+displaymgr=DisplayMgr
+displaymgr.print_avaliable_data()
+generationNumber=0
+print("\n> Generation #" str(generationNumber))
+population=Populacao(POPULATIO_SIZE)
+population.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
+displaymgr.print_generation(population)
+displaymgr.print_schedule_as_table(population.get_schedules()[0])
+algoritimogentico= AlgoritimoGenetico()
+while (population.get_schedules()[0].get_fitness() !=1.0):
+    generationNumber+=1
+    print("\n> Generation #" str(generationNumber))
+    population=algoritimogentico.evolve(population)
+    population.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
+    displaymgr.print_generation(population)
+    displaymgr.print_schedule_as_table(population.get_schedules()[0])
+print("\n\n")
