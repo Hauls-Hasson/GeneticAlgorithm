@@ -1,4 +1,4 @@
-from prettytable import PrettyTable as PrettyTable
+from prettytable import PrettyTable as PT
 import random as rnd
 POPULATIO_SIZE=9
 NUMBER_OF_ELITE_SCHEDULES=1
@@ -205,7 +205,7 @@ class DisplayMgr:
         self.print_horadaaula
     def print_periodo(self):
         periodo=Informacoes.get_horarios()
-        TabeladeperiodosDisponiveis=PrettyTable.PrettyTable(["Período","Matérias"])
+        TabeladeperiodosDisponiveis=PT.PrettyTable(["Período","Matérias"])
         for i in range(0,len(periodo)):
             materia=periodo._getitem_(i).get_materias()
             tempStr="["
@@ -215,7 +215,7 @@ class DisplayMgr:
             TabeladeperiodosDisponiveis.add_row([periodo._getitem_(i).get_name(), tempStr])
         print(TabeladeperiodosDisponiveis)
     def print_materia(self):
-        TabeladeMateriasDisponiveis=PrettyTable.PrettyTable(["id","materia #","max # de estudantes", "professores"])
+        TabeladeMateriasDisponiveis=PT.PrettyTable(["id","materia #","max # de estudantes", "professores"])
         materias=Informacoes.get_materias()
         for i in range (0, len(materias)):
             professores = materias[i].get_professores()
@@ -227,32 +227,32 @@ class DisplayMgr:
                 [materias[i].get_number(), materias[i].get_name(), str(materias[i].get_MaxnumberOfstudents()),tempStr])
         print(TabeladeMateriasDisponiveis)
     def print_professor(self):
-        TabeladeProfessoresDisponiveis=PrettyTable.PrettyTable(["id","Professor"])
+        TabeladeProfessoresDisponiveis=PT.PrettyTable(["id","Professor"])
         professores=Informacoes.get_professores()
         for i in range(0, len(professores)):
             TabeladeProfessoresDisponiveis.add_row([professores[i].get_id(), professores[i].get_name()])
         print(TabeladeProfessoresDisponiveis)
     def print_sala(self):
-        TabeladeSalasDisponiveis=PrettyTable.PrettyTable(["sala #", "capacidade máxima de alunos"])
+        TabeladeSalasDisponiveis=PT.PrettyTable(["sala #", "capacidade máxima de alunos"])
         salas=Informacoes.get_salas()
         for i in range (0, len(salas)):
             TabeladeSalasDisponiveis.add_row({str(salas[i].get_numero()), str(salas[i].get_capacidade) })
         print(TabeladeSalasDisponiveis)
     def print_horadaaula(self):
-        TabeladeHorasDisponiveis=PrettyTable.PrettyTable(["id","Hora de Aula"])
+        TabeladeHorasDisponiveis=PT.PrettyTable(["id","Hora de Aula"])
         horasdaAula=Informacoes.get_horadasaulas()
         for i in range(0, len(horasdaAula)):
             TabeladeHorasDisponiveis.add_row([horasdaAula[i].get_id(), horasdaAula[i].get_hora()])
         print(TabeladeHorasDisponiveis)
     def print_generation(self,population):
-        tabela1=PrettyTable.PrettyTable(["shedule #","fitness","# of conflicts","classes[periodo,horario, sala, professor]"])
+        tabela1=PT.PrettyTable(["shedule #","fitness","# of conflicts","classes[periodo,horario, sala, professor]"])
         schedules= population.get_schedules()
         for i in range(0, len(schedules)):
             tabela1.add_row([str(i),round(schedules[i].get_fitness(),3), schedules[i].get_numeroDeConflitos(), schedules[i]])
         print(tabela1)
     def print_schedule_as_table(self,schedule):
         classes=schedule.get_horarios()
-        tabela=PrettyTable.PrettyTable(["Classe #", "Periodo", "Materia(Numero, max # of students)","Sala(Capacidade)","Professor(Nome, Id)","Hora da Aula(Hora, id)"])
+        tabela=PT.PrettyTable(["Classe #", "Periodo", "Materia(Numero, max # of students)","Sala(Capacidade)","Professor(Nome, Id)","Hora da Aula(Hora, id)"])
         for i in range(0,len(classes)):
             tabela.add_row([str(i), classes[i].get_horarios().get_name(), classes[i].get_materia().get_name() + "(" + classes[i].get_materia().get_number()+ "," + str(classes[i].get_materia().get_MaxnumberOfstudents()) + ")" , classes[i].get_sala().get_number()+ "(" + str(classes[i].get_sala().get_capacidade()) + classes[i].get_professor().get_name() +"(" + str(classes[i].get_professor.get_id()) + ")" , classes[i].get_horasdaAula().get_hora() + "(" + str(classes[i].get_horasdaAula().get_id) + ")"])
         print(tabela)
