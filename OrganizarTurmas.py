@@ -14,9 +14,8 @@ class Informacoes:
                  ["P2", "José Freitas"],
                  ["P3", "Francisco"],
                  ["P4", "Nayara"]]
-    
     def __init__(self):
-        self._salas=[];self._horadasaulas=[]; self._professores[]
+        self._salas=[];self._horadasaulas=[]; self._professores=[]
         for i in range (0,len(self.Salas)):
             self._salas.append(Sala(self.Salas[i][0],self.Salas[i][1]))
         for i in range (0,len(self.HoradasAulas)):
@@ -38,12 +37,12 @@ class Informacoes:
         self._numerodeclasses=0
         for i in range(0,len(self._horarios)):
             self._numerodeclasses += len(self._horarios[i].get_materia())
-    def get_salas(self): return self._salas
-    def get_professores(self): return self._professores
-    def get_materias(self): return self._materias
-    def get_horarios(self): return self._horarios
-    def get_horadasaulas(self): return self._horadasaulas
-    def get_numerodeclasses(self): return self._numerodeclasses
+        def get_salas(self): return self._salas
+        def get_professores(self): return self._professores
+        def get_materias(self): return self._materias
+        def get_horarios(self): return self._horarios
+        def get_horadasaulas(self): return self._horadasaulas
+        def get_numerodeclasses(self): return self._numerodeclasses
 
 class Schedule:
     def __init__(self):
@@ -57,13 +56,13 @@ class Schedule:
         self._isFitnessChanged=True
         return self._horarios
     def get_numeroDeConflitos(self): return self._numeroDeConflitos
-    def get_fitnss(self): 
+    def get_fitness(self): 
         if (self.isFitnessChanged==True):
             self._fitness=self.calculate_fitness()
             self._isFitnessChanged=False
         return self._fitness
     def initialize(self):
-        profundidade=self._informacoes.getprofundidade()
+        profundidade=self._Informacoes.get_horarios()
         for i in range (0, len(profundidade)):
             materia=profundidade[i].get_materia()
             for j in range (0, len(materia)):
@@ -194,7 +193,7 @@ class Horario:
     def set_horadaaula(self,horadaaula):self._horadaaula=horadaaula
     def set_sala(self,sala):self._sala=sala
     def __str__(self):
-        return str(self._periodo.get_name())+ "," + str(self._materia.get_number()) + "," + str(self._sala.get_numero())+ "," + str(self._professor.get_id()) + "," + str(self._horadaaula.getide())
+        return str(self._periodo.get_name())+ "," + str(self._materia.get_number()) + "," + str(self._sala.get_numero())+ "," + str(self._professor.get_id()) + "," + str(self._horadaaula.get_id())
 
 class DisplayMgr:
     def print_avaliable_data(self):
@@ -206,7 +205,7 @@ class DisplayMgr:
         self.print_horadaaula
     def print_periodo(self):
         periodo=Informacoes.get_horarios()
-        TabeladeperiodosDisponiveis= PrettyTable(["Período","Matérias"])
+        TabeladeperiodosDisponiveis=PrettyTable.PrettyTable(["Período","Matérias"])
         for i in range(0,len(periodo)):
             materia=periodo._getitem_(i).get_materias()
             tempStr="["
@@ -215,13 +214,54 @@ class DisplayMgr:
             tempStr+=materia[len(materia)-1].__str__()+"]"
             TabeladeperiodosDisponiveis.add_row([periodo._getitem_(i).get_name(), tempStr])
         print(TabeladeperiodosDisponiveis)
-    def print_materia
+    def print_materia(self):
+        TabeladeMateriasDisponiveis=PrettyTable.PrettyTable(["id","materia #","max # de estudantes", "professores"])
+        materias=Informacoes.get_materias()
+        for i in range (0, len(materias)):
+            professores = materias[i].get_professores()
+            tempStr=""
+            for j in range(0,len(professores)):
+                tempStr += professores[j].__str__()+" , "
+            tempStr += professores[len(professores)-1].__str__()
+            TabeladeMateriasDisponiveis.add_row(
+                [materias[i].get_number(), materias[i].get_name(), str(materias[i].get_MaxnumberOfstudents()),tempStr])
+        print(TabeladeMateriasDisponiveis)
+    def print_professor(self):
+        TabeladeProfessoresDisponiveis=PrettyTable.PrettyTable(["id","Professor"])
+        professores=Informacoes.get_professores()
+        for i in range(0, len(professores)):
+            TabeladeProfessoresDisponiveis.add_row([professores[i].get_id(), professores[i].get_name()])
+        print(TabeladeProfessoresDisponiveis)
+    def print_sala(self):
+        TabeladeSalasDisponiveis=PrettyTable.PrettyTable(["sala #", "capacidade máxima de alunos"])
+        salas=Informacoes.get_salas()
+        for i in range (0, len(salas)):
+            TabeladeSalasDisponiveis.add_row({str(salas[i].get_numero()), str(salas[i].get_capacidade) })
+        print(TabeladeSalasDisponiveis)
+    def print_horadaaula(self):
+        TabeladeHorasDisponiveis=PrettyTable.PrettyTable(["id","Hora de Aula"])
+        horasdaAula=Informacoes.get_horadasaulas()
+        for i in range(0, len(horasdaAula)):
+            TabeladeHorasDisponiveis.add_row([horasdaAula[i].get_id(), horasdaAula[i].get_hora()])
+        print(TabeladeHorasDisponiveis)
+    def print_generation(self,population):
+        tabela1=PrettyTable.PrettyTable(["shedule #","fitness","# of conflicts","classes[periodo,horario, sala, professor]"])
+        schedules= population.get_schedules()
+        for i in range(0, len(schedules)):
+            tabela1.add_row([str(i),round(schedules[i].get_fitness(),3), schedules[i].get_numeroDeConflitos(), schedules[i]])
+        print(tabela1)
+    def print_schedule_as_table(self,schedule):
+        classes=schedule.get_horarios()
+        tabela=PrettyTable.PrettyTable(["Classe #", "Periodo", "Materia(Numero, max # of students)","Sala(Capacidade)","Professor(Nome, Id)","Hora da Aula(Hora, id)"])
+        for i in range(0,len(classes)):
+            tabela.add_row([str(i), classes[i].get_horarios().get_name(), classes[i].get_materia().get_name() + "(" + classes[i].get_materia().get_number()+ "," + str(classes[i].get_materia().get_MaxnumberOfstudents()) + ")" , classes[i].get_sala().get_number()+ "(" + str(classes[i].get_sala().get_capacidade()) + classes[i].get_professor().get_name() +"(" + str(classes[i].get_professor.get_id()) + ")" , classes[i].get_horasdaAula().get_hora() + "(" + str(classes[i].get_horasdaAula().get_id) + ")"])
+        print(tabela)
 Informacao=Informacoes()
 
 displaymgr=DisplayMgr
 displaymgr.print_avaliable_data()
 generationNumber=0
-print("\n> Generation #" str(generationNumber))
+print("\n> Generation #" + str(generationNumber))
 population=Populacao(POPULATIO_SIZE)
 population.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
 displaymgr.print_generation(population)
@@ -229,7 +269,7 @@ displaymgr.print_schedule_as_table(population.get_schedules()[0])
 algoritimogentico= AlgoritimoGenetico()
 while (population.get_schedules()[0].get_fitness() !=1.0):
     generationNumber+=1
-    print("\n> Generation #" str(generationNumber))
+    print("\n> Generation #" + str(generationNumber))
     population=algoritimogentico.evolve(population)
     population.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
     displaymgr.print_generation(population)
